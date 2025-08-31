@@ -3,10 +3,14 @@ require("sharedLibrary")
 openAllModems()
 
 currentInputs = {}
-currentInputs["joystick_1_x"] = 0
-currentInputs["joystick_1_y"] = 0
-currentInputs["joystick_2_x"] = 0
-currentInputs["joystick_2_y"] = 0
+currentInputs["joystick_1_x+"] = 0
+currentInputs["joystick_1_y+"] = 0
+currentInputs["joystick_2_x+"] = 0
+currentInputs["joystick_2_y+"] = 0
+currentInputs["joystick_1_x-"] = 0
+currentInputs["joystick_1_y-"] = 0
+currentInputs["joystick_2_x-"] = 0
+currentInputs["joystick_2_y-"] = 0
 currentInputs["shoulder_left"] = false
 currentInputs["shoulder_right"] = false
 currentInputs["button_a"] = false
@@ -29,7 +33,7 @@ parallel.waitForAny(
             if type(message) == "table" then
                 
                 if message.type == "input_update" then -- message.inputs only contains some of the inputs, not all of them at a time, they will all come in seperate messages
-                print("Recieved updated intputs from computer ID: " .. senderId)
+                    print("Recieved updated intputs from computer ID: " .. senderId .. "Inputs: " .. textutils.serialiseJSON(message.inputs))
                     for inputName, inputValue in pairs(message.inputs) do
                         if contains(acceptableInputs, inputName) then
                             currentInputs[inputName] = inputValue

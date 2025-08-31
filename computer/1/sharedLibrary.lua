@@ -20,3 +20,46 @@ function contains(list, value)
 end
 
 
+acceptableInputs = {
+    "joystick_1_x+" ,
+    "joystick_1_y+" ,
+    "joystick_2_x+" ,
+    "joystick_2_y+" ,
+    "joystick_1_x-" ,
+    "joystick_1_y-" ,
+    "joystick_2_x-" ,
+    "joystick_2_y-" ,
+    "shoulder_left",
+    "shoulder_right" ,
+    "button_a",
+    "button_b",
+    "button_x",
+    "button_y",
+    "dpad_up",
+    "dpad_down",
+    "dpad_left",
+    "dpad_right",
+    "trigger_left",
+    "trigger_right"
+}
+
+analogInputs = {
+    "joystick_1_x+" ,
+    "joystick_1_y+" ,
+    "joystick_2_x+" ,
+    "joystick_2_y+",
+    "joystick_1_x-" ,
+    "joystick_1_y-" ,
+    "joystick_2_x-" ,
+    "joystick_2_y-"
+}
+
+
+sides = {
+    "top",
+    "bottom",
+    "left",
+    "right",
+    "front",
+    "back"
+}

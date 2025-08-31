@@ -2,31 +2,7 @@ require("sharedLibrary")
 
 openAllModems()
 
-acceptableInputs = {
-    "joystick_1_x" ,
-    "joystick_1_y" ,
-    "joystick_2_x" ,
-    "joystick_2_y" ,
-    "shoulder_left",
-    "shoulder_right" ,
-    "button_a",
-    "button_b",
-    "button_x",
-    "button_y",
-    "dpad_up",
-    "dpad_down",
-    "dpad_left",
-    "dpad_right",
-    "trigger_left",
-    "trigger_right"
-}
 
-analogInputs = {
-    "joystick_1_x" ,
-    "joystick_1_y" ,
-    "joystick_2_x" ,
-    "joystick_2_y" 
-}
 
 registeredSides = {
     top = "",
@@ -37,16 +13,9 @@ registeredSides = {
     back = ""
 }
 
-sides = {
-    "top",
-    "bottom",
-    "left",
-    "right",
-    "front",
-    "back"
-}
 
 currentInputs = {}
+previousInputs = {}
 
 function setup()
     --asks which sides are analog and should be linmked to which part of currentInputs
@@ -79,22 +48,35 @@ function setup()
 end
 
 function mainLoop()
-    for side, value in ipairs(registeredSides) do
-        if side ~= "" then
-            if contains(analogInputs,side)  then
+    for side, value in pairs(registeredSides) do
+        if  value == "" then else
+            print("Reaching input on side: " .. side)
+            if contains(analogInputs,value)  then
+                print("analog reading...")
                 redstoneInput = redstone.getAnalogInput(side)    
+                print("redstone input: " .. tostring(redstoneInput))
             else
+                print("digital reading...")
                 redstoneInput = redstone.getInput(side)
+                print("redstone input: " .. tostring(redstoneInput))
             end
             
             currentInputs[value] = redstoneInput
         end
     end
+
+    
+    print("Current inputs: " .. textutils.serialiseJSON(currentInputs))
+    previousInputs = currentInputs
     rednet.broadcast({type="input_update", inputs=currentInputs})
-    os.sleep(0.05)
+    
+    
+    os.sleep(0.1)
 end
 
 setup()
+
+print("Complete setup. Starting main loop.")
 
 while true do
     mainLoop()
