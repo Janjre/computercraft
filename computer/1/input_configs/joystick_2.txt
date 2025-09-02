@@ -1,0 +1,1 @@
+{"top":"joystick_2_x+","front":"","bottom":"joystick_2_y-","right":"joystick_2_x-","left":"joystick_2_y+","back":""}

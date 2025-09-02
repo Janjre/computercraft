@@ -24,6 +24,17 @@ currentInputs["dpad_right"] = false
 currentInputs["trigger_left"] = false
 currentInputs["trigger_right"] = false
 
+currentOutputs = {}
+currentOutputs["propeller_left_front"] = 0
+currentOutputs["propeller_left_rear"] = 0
+currentOutputs["propeller_left_middle"] = 0
+currentOutputs["propeller_right_front"] = 0
+currentOutputs["propeller_right_rear"] = 0
+currentOutputs["propeller_right_middle"] = 0
+currentOutputs["propeller_side_direction"] = 0 -- false is left, true is right
+currentOutputs["propeller_side_percent"] = 0 -- this is a special one that just goes to the side propeller computer
+
+
 
 parallel.waitForAny(
 
@@ -48,6 +59,65 @@ parallel.waitForAny(
             end
             
         end
+    end,
+    function () -- processing and rebroadcasting 
+        
+        
+        while true do -- 100 is full, 0 is off, will be converteds to redstone resistors at the end
+            -- left joystick does pitch and roll
+        
+            local forwardness = currentInputs["joystick_1_y+"]
+            local backwardness = -currentInputs["joystick_1_y-"]
+            local pitchControl = forwardness + backwardness -- ranges between -15 and 15
+            local frontBackDifference = pitchControl * 2.5 -- turn forwardness and backwardness into a single value
+            local frontBacknessPercent = math.abs(frontBackDifference)
+            local frontBackDirection = frontBackDifference < 0 and -1 or 1 -- -1 is forward, 1 is backward
+            
+            local rollLeftness = -currentInputs["joystick_1_x-"]
+            local rollRightness = currentInputs["joystick_1_x+"]
+            local rollControl = rollLeftness + rollRightness -- ranges between -15 and 15
+            local leftRightDifference = rollControl * 2.5 -- turn rollLeftness and rollRightness into a single value
+            local leftRightPercent = math.abs(leftRightDifference)
+            local leftRightDirection = leftRightDifference < 0 and -1 or 1 -- -1 is left, 1 is right
+
+
+            -- right joystick does yaw and altitude control
+
+            local upness = currentInputs["joystick_2_y+"] 
+            local downness = -currentInputs["joystick_2_y-"]
+            local heightControl = upness + downness -- ranges between -15 and 15
+            local stayingLevelpercent = 13
+            local altitude = stayingLevelpercent + heightControl * 2.5 -- turn upness and downness into a single value
+
+
+            -- yaw control this controls one propeller on the side
+            local leftness = -currentInputs["joystick_2_x-"]
+            local rightness = currentInputs["joystick_2_x+"]
+            local yawControl = leftness + rightness -- ranges between -15 and 15
+            local yawPercentControl = yawControl * 2.5 -- turn leftness and rightness into a single value between -37.5 and 37.5
+            local sideProperllerPercent = math.abs(yawPercentControl)
+            local sideProperllerDirection = yawPercentControl < 0 and -1 or 1 -- -1 is left, 1 is right
+
+
+            --final combining of all the factors to get final propeller speeds
+            currentOutputs["propeller_left_front"] = math.min(100, math.max(0, (altitude*1.7) - frontBacknessPercent * frontBackDirection + leftRightPercent * leftRightDirection))
+            currentOutputs["propeller_left_middle"] = math.min(100, math.max(0, altitude + leftRightPercent * leftRightDirection))
+            currentOutputs["propeller_left_rear"] = math.min(100, math.max(0, (altitude*0.7) + frontBacknessPercent * frontBackDirection + leftRightPercent * leftRightDirection))
+            currentOutputs["propeller_right_front"] = math.min(100, math.max(0, (altitude*1.7) - frontBacknessPercent * frontBackDirection - leftRightPercent * leftRightDirection))
+            currentOutputs["propeller_right_middle"] = math.min(100, math.max(0, altitude - leftRightPercent * leftRightDirection))
+            currentOutputs["propeller_right_rear"] = math.min(100, math.max(0, (altitude*0.7) + frontBacknessPercent * frontBackDirection - leftRightPercent * leftRightDirection))
+
+            --side propellerChannel
+            currentOutputs["propeller_side_direction"] = tonumber(sideProperllerDirection) * 100
+            currentOutputs["propeller_side_percent"] = math.min(100, math.max(0, sideProperllerPercent))
+
+            for outputName, outputValue in pairs(currentOutputs) do
+                rednet.broadcast({type="output_update", resistance=outputValue,channel = outputName, label = os.getComputerLabel()})
+            end
+
+            os.sleep(0.05)
+        end
+        
     end
 
 )

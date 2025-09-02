@@ -19,6 +19,10 @@ function contains(list, value)
     return false
 end
 
+function clamp(value, min, max)
+    return math.max(min, math.min(max, value))
+end
+
 
 acceptableInputs = {
     "joystick_1_x+" ,

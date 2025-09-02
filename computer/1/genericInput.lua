@@ -68,13 +68,53 @@ function mainLoop()
     
     print("Current inputs: " .. textutils.serialiseJSON(currentInputs))
     previousInputs = currentInputs
-    rednet.broadcast({type="input_update", inputs=currentInputs})
+    rednet.broadcast({type="input_update", inputs=currentInputs, label = os.getComputerLabel()})
     
     
     os.sleep(0.1)
 end
 
-setup()
+print("Would you like to load a saved configuration? (y/n)")
+local loadConfig = read()
+
+if loadConfig == "y" then
+    print("What is the name of the configuration file? (default: inputConfig.txt)")
+    local configName = read()
+    if (string.sub(configName, -4) ~= ".txt") then
+        configName = configName .. ".txt"
+    end
+    if fs.exists("input_configs/"..configName) then
+        local file = fs.open("input_configs/"..configName, "r")
+        local content = file.readAll()
+        file.close()
+        registeredSides = textutils.unserialiseJSON(content)
+        print("Loaded configuration: " .. textutils.serialiseJSON(registeredSides))
+    else
+        print("No saved configuration found. Starting setup.")
+        setup()
+    end
+else
+    setup()
+end
+
+
+print("Would you like to save your input configuration? (y/n)")
+
+local saveConfig = read()
+
+if saveConfig == "y" then
+    
+    print("What would you like to name this configuration?")
+
+    local configName = read()
+
+    local file = fs.open("input_configs"..configName, "w")
+    file.writeLine(textutils.serialiseJSON(registeredSides))
+    file.close()
+    print("Configuration saved to inputConfig.txt")
+else
+    print("Configuration not saved.")
+end
 
 print("Complete setup. Starting main loop.")
 
