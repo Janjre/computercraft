@@ -1,0 +1,1 @@
+{"top":"trigger_left","front":"","bottom":"shoulder_left","right":"trigger_right","left":"shoulder_right","back":""}
