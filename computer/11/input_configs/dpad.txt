@@ -1,0 +1,1 @@
+{"top":"dpad_up","front":"","bottom":"dpad_down","right":"dpad_right","left":"dpad_left","back":""}

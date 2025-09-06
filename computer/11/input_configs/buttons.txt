@@ -1,0 +1,1 @@
+{"top":"button_x","front":"","bottom":"button_a","right":"button_b","left":"button_y","back":""}

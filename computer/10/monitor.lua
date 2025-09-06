@@ -237,6 +237,8 @@ parallel.waitForAny(
                             mon.setCursorPos(1, line)
                             wrapWrite(mon,"Type: " .. msg.type .. "Content: "  .. textutils.serialiseJSON(msg.content) .. "   ",3, 50)
                             line = line + 4
+                        elseif msg.type == "ping" then
+                            print("PONG")
                         end
                     end
                 end
